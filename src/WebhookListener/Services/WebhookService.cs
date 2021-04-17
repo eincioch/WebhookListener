@@ -24,7 +24,6 @@ namespace WebhookListener.Services
 		{
 			using StreamReader stream = new StreamReader(request.Body);
 			var jsonBody = await stream.ReadToEndAsync();
-			object body = string.IsNullOrEmpty(jsonBody) ? null : JsonSerializer.Deserialize<object>(jsonBody);
 			Dictionary<string, string> headers = request.Headers.ToDictionary(a => a.Key, a => string.Join(";", a.Value));
 			Dictionary<string, string> queryParams = request.Query.ToDictionary(a => a.Key, a => string.Join(";", a.Value));
 
@@ -33,7 +32,7 @@ namespace WebhookListener.Services
 				Id = id,
 				Headers = headers,
 				QueryParams = queryParams,
-				Body = body
+				Body = jsonBody
 			};
 
 			var json = JsonSerializer.Serialize(requestModel);

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace WebhookListener.Console.Services
 			_queueName = _configuration["ServiceBusQueueName"];
 			_webhookEnpoint = _configuration["WebhookEndpoint"];
 			_restClient = new RestClient(_webhookEnpoint);
+			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 		}
 
 		internal void Run()
@@ -44,10 +46,12 @@ namespace WebhookListener.Console.Services
 
 		private async Task SendRequestAsync(RequestModel request)
 		{
+			request.Headers.Remove("Host");
 			var resource = string.IsNullOrEmpty(request.Id) ? string.Empty : $"/{request.Id}";
 			var restRequest = new RestRequest(resource, Method.POST);
+			restRequest.RequestFormat = DataFormat.Json;
 			restRequest.AddHeaders(request.Headers);
-			restRequest.AddJsonBody(request.Body);
+			restRequest.AddParameter("application/json", request.Body, ParameterType.RequestBody);
 			foreach (var parameter in request.QueryParams)
 			{
 				restRequest.AddQueryParameter(parameter.Key, parameter.Value);

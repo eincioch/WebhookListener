@@ -7,6 +7,6 @@ namespace WebhookListener.Common.Models
 		public string Id { get; set; }
 		public Dictionary<string, string> Headers { get; set; }
 		public Dictionary<string, string> QueryParams { get; set; }
-		public object Body { get; set; }
+		public string Body { get; set; }
 	}
 }
